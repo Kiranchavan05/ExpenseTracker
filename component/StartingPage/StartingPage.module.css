@@ -1,0 +1,51 @@
+.header{
+  font-style: italic;
+  font-weight: 10px;
+  border-bottom-style: solid;
+  display: flex;
+  justify-content: space-between;
+}
+
+.header .email{
+  margin-top: 10px;
+  margin-bottom:10px;
+  
+} 
+
+.header .logout{
+  margin-top: 10px;
+  margin-bottom:10px;
+  padding:10px
+}
+
+.header span{
+  margin-top: 10px;
+  background-color: bisque;
+  margin-bottom: 10px;
+  padding-top: 10px;
+  border-radius: 25px;
+}
+.header span button{
+  background-color: transparent;
+  border: none;
+  color: blue;
+  font-weight:bold;
+  font-style: italic;
+}
+
+  .email {
+    border-radius: 10px;
+     background-color: rgb(155, 205, 117);
+    color: black;
+
+    
+    
+  }
+   
+  .logout{
+    border-radius: 10px;
+     background-color: rgb(207, 77, 51);
+    color: black;
+    margin-left: 10px;
+
+  }
