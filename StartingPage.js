@@ -1,12 +1,15 @@
 import classes from './StartingPage.module.css'
-import React,{Fragment, useContext} from 'react';
+import React,{Fragment,useCallback,useEffect, useContext, useState} from 'react';
 import {useHistory} from 'react-router-dom'
 import AuthContext from '../../store/auth-context';
+import ExpenseForm from './ExpenseForm';
+import ExpenseList from './ExpenseList';
 // import ProfilePage from './ProfilePage';
 
 const StartingPage=()=>{
   const history=useHistory()
   const authCtx=useContext(AuthContext)
+  const [items,setItems]=useState([])
 
 
 
@@ -51,6 +54,37 @@ const StartingPage=()=>{
       history.replace('/')
     }
 
+    const saveExpenseDataHandler = (expense) => {
+      setItems((prev) => [...prev, expense]);
+    };
+
+    const getExpense = useCallback(async() => {
+      const response = await fetch(
+        "https://expense-auth-ce2b3-default-rtdb.firebaseio.com/expenses.json"
+      )
+      const data = await response.json()
+      console.log(data)
+
+      const loadedExpenses = []
+
+      for (const key in data) {
+        loadedExpenses.push({
+          id : key,
+          amount : data[key].amount,
+          description : data[key].description,
+          category : data[key].category
+        })
+      }
+
+      setItems(loadedExpenses)
+
+    },[])
+
+
+useEffect(() => {
+  getExpense()
+},[getExpense])
+
     return (
       <Fragment>
       <div className={classes.header}>
@@ -59,6 +93,8 @@ const StartingPage=()=>{
         <button onClick={logoutHandler} className={classes.logout}>Logout</button>
         <span>Your Profile is Incomplete. <button onClick={routeChange}>Complete now</button></span>
       </div>
+      <ExpenseForm onSaveData={saveExpenseDataHandler}/>
+      <ExpenseList items={items} />
     </Fragment>
       
       );
