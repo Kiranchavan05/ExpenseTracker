@@ -1,6 +1,6 @@
 import AuthContext from '../../store/auth-context';
 import classes from './ProfilePage.module.css'
-import { Fragment, useContext, useRef } from 'react';
+import { Fragment, useContext, useRef ,useEffect} from 'react';
 
 
 
@@ -40,8 +40,42 @@ const ProfilePage=()=>{
         console.log('received data ',data)
       }).catch(err=> console.log(err))
 
-    
      }
+
+     const getData = () => {
+        fetch(
+          "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyDQkJzMSxna8JiN6hDqpbwqZkH5J9uSN4s",
+          {
+            method: "POST",
+            body: JSON.stringify({ idToken: authCtx.token }),
+          }
+        )
+          .then((res) => {
+            if (res.ok) {
+              return res.json();
+            } else {
+              return res.json().then((data) => {
+                console.log(data);
+                if (data.error.message) {
+                  alert(data.error.message);
+                }
+              });
+            }
+          })
+          .then((data) => {
+            console.log("received data ", data);
+           if (data.users) {
+            nameRef.current.value = data.users[0].displayName
+            urlRef.current.value = data.users[0].photoUrl;
+           }
+          })
+          .catch((err) => console.log(err));
+      }
+    
+      useEffect( getData , [])
+    
+
+
 
     return (
          <Fragment>
