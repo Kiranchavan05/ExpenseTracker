@@ -45,12 +45,18 @@ const StartingPage=()=>{
       })
       .catch((err) => console.log(err));
     }
+     
+    const logoutHandler=()=>{
+      authCtx.logout()
+      history.replace('/')
+    }
+
     return (
       <Fragment>
       <div className={classes.header}>
-        <h3>Welcome to Expense Tracker !!!</h3>
-        
+        <h4>Welcome to Expense Tracker !!!</h4>
         <button onClick={verification} className={classes.email}>Verify Email</button>
+        <button onClick={logoutHandler} className={classes.logout}>Logout</button>
         <span>Your Profile is Incomplete. <button onClick={routeChange}>Complete now</button></span>
       </div>
     </Fragment>
