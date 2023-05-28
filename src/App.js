@@ -1,29 +1,21 @@
-import { Switch, Route,Redirect} from 'react-router-dom';
-import './App.css';
-// import AuthForm from './component/Auth/AuthForm';
-import HomePage from './component/Pages/HomePages';
-import AuthPage from './component/Pages/AuthPage';
-import { useContext } from 'react';
-import AuthContext from './store/auth-context';
+import { Fragment } from 'react';
+import Counter from './components/Counter';
+import Header from './components/Header';
+import Auth from './components/Auth';
+import {useSelector} from 'react-redux'
+import UserProfie from './components/UserProfile'
+
 
 function App() {
-  const authCtx= useContext(AuthContext)
+  const isAuth=useSelector(state=>state.auth.isAuthenticated)
   return (
-    <div className="App">
-      <Switch>
-        <Route path='/' exact>
-        <AuthPage /> 
-        </Route>
-        {authCtx.isLoggedIn && <Route path='/home'>
-            <HomePage />
-        </Route>}
+    <Fragment>
+      <Header />
+      {!isAuth && <Auth />}
+      {isAuth && <UserProfie />}
+      <Counter />
 
-        <Route path='*'>
-          <Redirect to='/'/>
-        </Route>
-      </Switch>
-     
-    </div>
+    </Fragment>
   );
 }
 
