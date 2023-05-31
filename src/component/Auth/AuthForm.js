@@ -1,7 +1,10 @@
-import React, { useState, useRef,useContext } from "react";
+import React, { useState, useRef } from "react";
 import classes from "./AuthForm.module.css";
 import {useHistory} from 'react-router-dom'
-import AuthContext from "../../store/auth-context";
+// import AuthContext from "../../store/auth-context";
+import {useDispatch} from 'react-redux'
+import { authActions } from "../../store/Authentication";
+
 
 
 const AuthForm = () => {
@@ -9,8 +12,12 @@ const AuthForm = () => {
   const passwordInputRef = useRef();
   const confirmpasswordInputRed = useRef();
   const [isLogin, setIsLogin] = useState(true);
- const authCtx= useContext(AuthContext)
+  const [loading,setLoading]=useState(false)
+//  const authCtx= useContext(AuthContext)
   const history =useHistory()
+  const dispatch=useDispatch()
+
+
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
@@ -24,7 +31,9 @@ const AuthForm = () => {
     const enteredconfirmpassword = confirmpasswordInputRed.current.value;
 
     //optional: add validation ;
+
     let url;
+    setLoading(true)
     if (isLogin) {
         url=
         "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDQkJzMSxna8JiN6hDqpbwqZkH5J9uSN4s";
@@ -46,6 +55,7 @@ const AuthForm = () => {
         }
       )
         .then((res) => {
+          setLoading(false);
           if (res.ok) {
             //someyhing
             // console.log("asfs");
@@ -58,8 +68,9 @@ const AuthForm = () => {
           }
         })
         .then((data) => {
-          // console.log(data);
-          authCtx.login(data.idToken)
+          console.log('sdasdaSCASC',data);
+          // authCtx.login(data.idToken,data.email)
+          dispatch(authActions.login({token:data.idToken, email:data.email}))
           history.replace('/home')
         })
         .catch((error) => {
@@ -67,6 +78,12 @@ const AuthForm = () => {
           alert(error.message);
         });
   };
+
+  const resetPassword = () => {
+    history.push('/resetpassword')
+    console.log('sa')
+  }
+
 
   return (
     <section className={classes.auth}>
@@ -96,8 +113,12 @@ const AuthForm = () => {
         </div>
 
         <div className={classes.actions}>
-           <button>{isLogin ? "Login" : "Create Account"}</button>
-          <button
+          {loading ? 'Loading...': <button type="submit">{isLogin ? "Login" : "Create Account"}</button>}
+          </div>
+           {isLogin && <button type="button" className={classes.pwd} onClick={resetPassword} >forgot password?</button>}
+          
+          <div className={classes.actions}>
+            <button
             type="button"
             className={classes.toggle}
             onClick={switchAuthModeHandler}
@@ -106,6 +127,10 @@ const AuthForm = () => {
           </button>
         </div>
       </form>
+      <div>
+       
+
+      </div>
     </section>
   );
 };
