@@ -1,12 +1,13 @@
 import React,{useState,useEffect} from "react";
 import classes from './ExpenseList.module.css'
-import { useDispatch } from "react-redux";
+import { useDispatch,useSelector } from "react-redux";
 import { expenseActions } from "../../store/Expenses";
 
 
 const ExpenseList = (props) => {
   const [receivedExpense, setReceivedExpense] = useState([]);
   const dispatch = useDispatch();
+  const premium=useSelector(state=>state.expense.showPremium)
 
   useEffect(() => {
     fetch(
@@ -32,10 +33,10 @@ const ExpenseList = (props) => {
       });
   }, [dispatch]);
 
-  const deleteHandler = async (id) => {
-    console.log("wewewewew", id);
+  const deleteHandler = async (key) => {
+    console.log("wewewewew", key);
     const response = await fetch(
-      `https://expense-auth-ce2b3-default-rtdb.firebaseio.com/expenses/${id}.json`,
+      `https://expense-auth-ce2b3-default-rtdb.firebaseio.com/expenses/${key}.json`,
       {
         method: "DELETE",
       }
@@ -44,7 +45,7 @@ const ExpenseList = (props) => {
     if (response.ok) {
       setReceivedExpense((prevExpenses) => {
         const updatedExpenses = { ...prevExpenses };
-        delete updatedExpenses[id];
+        delete updatedExpenses[key];
         return updatedExpenses;
       });
     }
@@ -69,6 +70,22 @@ const ExpenseList = (props) => {
     deleteHandler(key)
 
   };
+  let totalAmount = 0
+if (receivedExpense){
+  Object.values(receivedExpense).forEach(expense => {
+    totalAmount += +expense.amount 
+  }) 
+} else {
+  totalAmount = 0
+} 
+
+if(totalAmount > 10000){
+  dispatch(expenseActions.Premium())
+
+} else{
+  dispatch(expenseActions.notPremium())
+}
+
 
   return (
     <React.Fragment>
@@ -94,6 +111,10 @@ const ExpenseList = (props) => {
           </li>
         )) :<h2>No data found </h2>}
       </ul>
+      <div style={{textAlign : 'center'}}>
+        <h1>Total Amount:{totalAmount} </h1>
+
+      </div>
     </React.Fragment>
   );
 };

@@ -1,5 +1,5 @@
 import classes from './StartingPage.module.css'
-import React,{Fragment,  useState} from 'react';
+import React,{Fragment,  useState,useEffect} from 'react';
 import {useHistory} from 'react-router-dom'
 // import AuthContext from '../../store/auth-context';
 import ExpenseForm from './ExpenseForm';
@@ -7,6 +7,8 @@ import ExpenseList from './ExpenseList';
 // import ProfilePage from './ProfilePage';
 import { useDispatch,useSelector } from 'react-redux';
 import { authActions } from '../../store/Authentication';
+import { expenseActions } from '../../store/Expenses';
+import {saveAs} from 'file-saver'
 
 const StartingPage=()=>{
   const history=useHistory()
@@ -14,9 +16,15 @@ const StartingPage=()=>{
   // const [items,setItems]=useState([])
   const [editItem, setEditItem]=useState(null)
 
+  const receivedData=useSelector(state=>state.expense?.data)
+
 
   const dispatch = useDispatch()
   const token = useSelector(state => state.authentication.token)
+
+  const premium = useSelector(state => state.expense.showPremium)
+  let [isPremiumClicked, setIsPremiumClicked]=useState(false)
+
 
 
 
@@ -59,6 +67,8 @@ const StartingPage=()=>{
     const logoutHandler=()=>{
       // authCtx.logout()
       dispatch(authActions.logout())
+      localStorage.removeItem("darktheme");
+      localStorage.removeItem("isPremiumClicked");
       history.replace('/')
     }
 
@@ -102,19 +112,74 @@ const StartingPage=()=>{
 //   })
 // }
 
-const editHandler = item => {
-  console.log('received editing id ',item)
-  setEditItem(item)
+const editHandler =key => {
+  console.log('received editing id ',key)
+  setEditItem(key)
 
 }
 
+
+const changeToDark = () => {
+  dispatch(expenseActions.toggle())
+}
+
+const downloadFile = () => {
+  const csv =
+      "Category,Description,Amount\n" +
+      Object.values(receivedData)
+        .map(
+          ({ category, description, amount }) =>
+            `${category},${description},${amount}`
+        )
+        .join("\n");
+
+    // Create a new blob with the CSV data
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+
+    // Save the blob as a file with the name "expenses.csv"
+    saveAs(blob, "expenses.csv")
+}
+
+
+useEffect(() => {
+  const premiumClickedStatus = localStorage.getItem("isPremiumClicked");
+  if (premiumClickedStatus) {
+    setIsPremiumClicked(JSON.parse(premiumClickedStatus));
+  }
+}, []);
+
+useEffect(() => {
+  localStorage.setItem("isPremiumClicked", JSON.stringify(isPremiumClicked));
+}, [isPremiumClicked]);
+
+
+
+const activatePremium = () => {
+  localStorage.setItem('isPremiumClicked', true)
+  window.location.reload()
+}
 
     return (
       <Fragment>
       <div className={classes.header}>
         <h4>Welcome to Expense Tracker !!!</h4>
         <button onClick={verification} className={classes.email}>Verify Email</button>
+        {premium &&  (
+            <button className={classes.premium} onClick={activatePremium}>
+              Activate premium
+            </button>
+          )}
         <button onClick={logoutHandler} className={classes.logout}>Logout</button>
+        {premium && isPremiumClicked && (
+            <button className={classes.toggle} onClick={changeToDark}>
+              Toggle dark/light Theme
+            </button>
+          )}
+          {premium && isPremiumClicked && (
+            <button className={classes.download} onClick={downloadFile}>
+              Download Expense
+            </button>
+          )}
         <span>Your Profile is Incomplete. <button onClick={routeChange}>Complete now</button></span>
       </div>
       <ExpenseForm  editItem={editItem}/>

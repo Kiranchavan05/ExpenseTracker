@@ -9,17 +9,18 @@ import store from './store';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+const Dark =localStorage.getItem('darkTheme')==='true'
 root.render(
   
-    <BrowserRouter>
+    <div className={Dark ? 'dark' : null}>
     <Provider store={store}>
-    {/* <AuthContextProvider> */}
-  
+    <BrowserRouter>
     <App />
+    </BrowserRouter>
+    </Provider>
+    </div>
   
-  {/* </AuthContextProvider> */}
-  </Provider>
-  </BrowserRouter>
   
 );
 

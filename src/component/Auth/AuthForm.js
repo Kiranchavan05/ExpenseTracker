@@ -23,6 +23,8 @@ const AuthForm = () => {
     setIsLogin((prevState) => !prevState);
   };
 
+  
+
   const submitHandler = (event) => {
     event.preventDefault();
 
